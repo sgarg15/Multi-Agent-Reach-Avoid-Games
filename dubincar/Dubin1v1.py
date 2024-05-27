@@ -6,6 +6,7 @@ import heterocl as hcl
 from odp.Grid import Grid
 import numpy as np
 from odp.Plots import PlotOptions
+from odp.Plots.plotting_utilities import plot_isosurface, plot_valuefunction
 from odp.Shapes import *
 from odp.solver import HJSolver
 from DubinCarDynamics1v1 import DubinCar1v1
@@ -68,7 +69,7 @@ t_step = 0.025
 small_number = 1e-5
 tau = np.arange(0, loopback_length + small_number, t_step)
 
-po = PlotOptions(do_plot=False, plot_type="set", plotDims=[0, 1], slicesCut=[22, 22])
+po = PlotOptions(do_plot=True, plot_type="set", plotDims=[0, 1, 2])
 
 
 compMethods = {"TargetSetMode": "minVWithVTarget", "ObstacleSetMode": "maxVWithObstacle"} # original one
@@ -76,8 +77,12 @@ compMethods = {"TargetSetMode": "minVWithVTarget", "ObstacleSetMode": "maxVWithO
 solve_start_time = time.time()
 
 result = HJSolver(agents_1v1, grid, [reach_set, avoid_set], tau, compMethods, po, saveAllTimeSteps=None)
+# While file needs to be saved locally, set save_fig=True and filename, recommend to set interactive_html=True for better visualization
+po2 = PlotOptions(do_plot=True, plot_type="set", plotDims=[0,1,2],
+                  slicesCut=[1], colorscale="Bluered", save_fig=True, filename="plots/3D_0_sublevel_set", interactive_html=True)
 
-# result = HJSolver(my_2agents, g, avoid_set, tau, compMethods, po, saveAllTimeSteps=True)
+# STEP 6: Call Plotting function
+plot_isosurface(grid, result, po2)
 process = psutil.Process(os.getpid())
 print(f"The CPU memory used during the calculation of the value function is {process.memory_info().rss/1e9: .2f} GB.")  # in bytes
 
@@ -95,6 +100,10 @@ print(f"The value function has been saved successfully.")
 # Record the time of whole process
 end_time = time.time()
 print(f"The time of whole process is {end_time - start_time} seconds.")
+
+
+
+
 
 
 
