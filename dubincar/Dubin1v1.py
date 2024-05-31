@@ -13,7 +13,7 @@ from DubinCarDynamics1v1 import DubinCar1v1
 
 start_time = time.time()
 
-grid_size = 6
+grid_size = 8
 grid = Grid(np.array([-1.0, -1.0, -1.0, -1.0, -1.0, -1.0]), np.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0]),
              6, np.array([grid_size, grid_size, grid_size, grid_size, grid_size, grid_size]))
 process = psutil.Process(os.getpid())
@@ -69,7 +69,7 @@ t_step = 0.025
 small_number = 1e-5
 tau = np.arange(0, loopback_length + small_number, t_step)
 
-po = PlotOptions(do_plot=True, plot_type="set", plotDims=[0, 1, 2])
+po = PlotOptions(do_plot=False, plot_type="set", plotDims=[0, 1, 2], slicesCut=[1, 2, 3])
 
 
 compMethods = {"TargetSetMode": "minVWithVTarget", "ObstacleSetMode": "maxVWithObstacle"} # original one
@@ -78,11 +78,15 @@ solve_start_time = time.time()
 
 result = HJSolver(agents_1v1, grid, [reach_set, avoid_set], tau, compMethods, po, saveAllTimeSteps=None)
 # While file needs to be saved locally, set save_fig=True and filename, recommend to set interactive_html=True for better visualization
-po2 = PlotOptions(do_plot=True, plot_type="set", plotDims=[0,1,2],
-                  slicesCut=[1], colorscale="Bluered", save_fig=True, filename="plots/3D_0_sublevel_set", interactive_html=True)
+po2 = PlotOptions(do_plot=False, plot_type="set", plotDims=[0,1, 2],
+                  slicesCut=[1, 2, 3], colorscale="Bluered", save_fig=True, filename="plots/3D_0_sublevel_set", interactive_html=True)
+
+po3 = PlotOptions(do_plot=False, plot_type="value", plotDims=[0, 1],
+                    slicesCut=[2, 2], colorscale="Bluered", save_fig=True, filename="plots/2D_0_sublevel_set", interactive_html=True)
 
 # STEP 6: Call Plotting function
 plot_isosurface(grid, result, po2)
+plot_valuefunction(grid, result, po3)
 process = psutil.Process(os.getpid())
 print(f"The CPU memory used during the calculation of the value function is {process.memory_info().rss/1e9: .2f} GB.")  # in bytes
 
